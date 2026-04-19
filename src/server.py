@@ -4,8 +4,12 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse
 
-from src.models import Task, add_task_to_file, list_tasks_from_file
-    
+# Temop fix to support both horizon.io (absolute import) and Docker (relative import)
+try:
+    from models import Task, add_task_to_file, list_tasks_from_file
+except ImportError:
+    from .models import Task, add_task_to_file, list_tasks_from_file
+
 
 mcp = FastMCP("Sarvesh's task manager")
 
