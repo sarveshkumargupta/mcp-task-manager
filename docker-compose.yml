@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  task-manager:
+    build: .
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      PYTHONUNBUFFERED: 1
