@@ -1,27 +1,33 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
-# Install uv
-RUN pip install uv
+# Copy uv binary from official image
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
-
-# Copy pyproject.toml
-COPY pyproject.toml .
 
 # Create data directory
 RUN mkdir -p data
 
-# Install dependencies using uv
-RUN uv pip install -e .
+# Copy only dependency files first (for better caching)
+COPY pyproject.toml uv.lock ./
+
+# Install dependencies (without the project itself)
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-install-project
 
 # Copy source code
 COPY src/ src/
 
-# Expose port
-EXPOSE 9000
+# Install the project
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
+ENV PATH="/app/.venv/bin:$PATH"
 
-# Run the server
-CMD ["python", "src/server.py"]
+# Expose port
+EXPOSE 9000
+
+# Run the server with uvicorn
+CMD ["uvicorn", "src.server:app", "--host", "0.0.0.0", "--port", "9000"]

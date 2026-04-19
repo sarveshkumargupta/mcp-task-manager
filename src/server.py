@@ -1,4 +1,6 @@
 from fastmcp import FastMCP
+from starlette.middleware import Middleware
+from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse
 
@@ -32,6 +34,27 @@ async def list_tasks() -> list[Task]:
     return await list_tasks_from_file()
 
 
+# Configure CORS middleware for MCP Inspector (browser-based client)
+middleware = [
+    Middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Note: Use specific origins in production
+        allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+        allow_headers=[
+            "mcp-protocol-version",
+            "mcp-session-id",
+            "Authorization",
+            "Content-Type",
+        ],
+        expose_headers=["mcp-session-id"],
+    )
+]
+
+# Create ASGI application
+app = mcp.http_app(middleware=middleware)
+
+
 if __name__ == "__main__":
-    # Run with HTTP transport
-    mcp.run(transport="http", host="0.0.0.0", port=9000)
+    # Run with uvicorn ASGI server
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=9000)
