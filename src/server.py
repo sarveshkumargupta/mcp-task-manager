@@ -4,7 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse
 
-from .models import Task, add_task_to_file, list_tasks_from_file
+from src.models import Task, add_task_to_file, list_tasks_from_file
     
 
 mcp = FastMCP("Sarvesh's task manager")
