@@ -1,4 +1,4 @@
-# mcp-task-manager
+# MCP Task Manager (Study and Interview)
 
 A Model Context Protocol (MCP) server for task management. Built with FastMCP and async/await support for non-blocking file operations.
 
